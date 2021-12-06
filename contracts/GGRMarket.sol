@@ -60,7 +60,7 @@ contract GGRMarket is ReentrancyGuard {
         2. Create a market sale for buying and selling between parties.
      */
 
-    function mintMarketItem(
+    function makeMarketItem(
         address nftContract,
         uint256 tokenId,
         uint256 price
@@ -139,6 +139,66 @@ contract GGRMarket is ReentrancyGuard {
         for (uint256 i = 0; i < itemCount; i++) {
             if (idToMarketToken[i + 1].owner == address(0)) {
                 uint256 currentId = i + 1;
+                MarketToken storage currentItem = idToMarketToken[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+
+        return items;
+    }
+
+    // Return nfts that the user has purchased
+
+    function fetchMyNFTs() public view returns (MarketToken[] memory) {
+        uint256 totalItemCount = _tokenIds.current();
+        // 2nd counter for each individual user
+        uint256 itemCount = 0;
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].owner == msg.sender) {
+                itemCount += 1;
+            }
+        }
+
+        // second loop to loop through the amount you have purchased with item count
+        // check to see if the owner address is equal to msg.sender
+
+        MarketToken[] memory items = new MarketToken[](itemCount);
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].owner == msg.sender) {
+                uint256 currentId = idToMarketToken[i + 1].itemId;
+                // current array
+                MarketToken storage currentItem = idToMarketToken[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+
+        return items;
+    }
+
+    // Return an array of minted nfts
+    function fetchItemsCreated() public view returns (MarketToken[] memory) {
+        uint256 totalItemCount = _tokenIds.current();
+        uint256 itemCount = 0;
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].seller == msg.sender) {
+                itemCount += 1;
+            }
+        }
+
+        // second loop to loop through the amount you have purchased with item count
+        // check to see if the seller address is equal to msg.sender
+
+        MarketToken[] memory items = new MarketToken[](itemCount);
+        for (uint256 i = 0; i < totalItemCount; i++) {
+            if (idToMarketToken[i + 1].seller == msg.sender) {
+                uint256 currentId = idToMarketToken[i + 1].itemId;
+                // current array
                 MarketToken storage currentItem = idToMarketToken[currentId];
                 items[currentIndex] = currentItem;
                 currentIndex += 1;
