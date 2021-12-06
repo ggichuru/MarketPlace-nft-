@@ -6,4 +6,4 @@ const settings = {
     ac_pk: process.env.AC_PK
 }
 
-export default settings
+exports.default = settings
